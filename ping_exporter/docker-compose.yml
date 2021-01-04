@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  ping_exporter:
+    container_name: ping_exporter
+    image: czerwonk/ping_exporter
+    volumes:
+      - ./config/:/config/
+    environment:
+      - CONFIG_FILE=/config/ping_exporter.yml
+    ports:
+      - 9427:9427
+    restart: always

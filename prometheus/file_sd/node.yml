@@ -1,0 +1,5 @@
+- labels:
+    env: demosite
+  targets:
+  - localhost:9100
+  - demo.cloudalchemy.org:9100

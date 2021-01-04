@@ -1,0 +1,12 @@
+[{
+    "targets": [
+      "192.168.21.254:9100"
+    ],
+    "labels": {
+      "hostname":"CentOS",
+      "site":"HCM",
+      "env":"Linux-Server",
+      "own":"IT"
+    }
+ }
+]

@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  blackbox_exporter:
+    container_name: blackbox
+    image: prom/blackbox-exporter
+    dns: 8.8.8.8
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./:/config
+    command:
+      - '--config.file=/config/blackbox.yml'
+    restart: always

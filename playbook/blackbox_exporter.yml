@@ -1,0 +1,4 @@
+- hosts: localhost
+  become: true
+  roles:
+    - cloudalchemy.blackbox-exporter

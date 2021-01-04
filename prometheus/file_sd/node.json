@@ -1,0 +1,82 @@
+[{
+    "targets": [
+      "192.168.56.102:9100"
+    ],
+    "labels": {
+      "hostname":"prometheus",
+      "site":"HCM"
+    }
+  },
+  {
+    "targets": [
+      "10.0.0.1:9100"
+    ],
+    "labels": {
+      "env":"prod",
+      "role":"web",
+      "owner":"infra",
+      "hostname":"HCM-PRD-WEB-01",
+      "site":"HCM"
+    }
+  },
+  {
+    "targets": [
+      "10.0.0.2:9100"
+    ],
+    "labels": {
+      "env":"prod",
+      "role":"database",
+      "owner":"infra",
+      "hostname":"HCM-PRD-DB-01",
+      "site":"HCM"
+    }
+  },
+  {
+    "targets": [
+      "10.0.0.3:9100"
+    ],
+    "labels": {
+      "env":"prod",
+      "role":"app",
+      "owner":"infra",
+      "hostname":"HCM-PRD-APP-01",
+      "site":"HCM"
+    }
+  },
+  {
+    "targets": [
+      "10.0.10.1:9100"
+    ],
+    "labels": {
+      "env":"uat",
+      "role":"web",
+      "owner":"dev",
+      "hostname":"HNI-UAT-WEB-01",
+      "site":"HN"
+    }
+  },
+  {
+    "targets": [
+      "10.0.10.2:9100"
+    ],
+    "labels": {
+      "env":"uat",
+      "role":"app",
+      "owner":"dev",
+      "hostname":"HNI-UAT-APP-01",
+      "site":"HN"
+    }
+  },
+  {
+    "targets": [
+      "110.0.10.3:9100"
+    ],
+    "labels": {
+      "env":"uat",
+      "role":"database",
+      "owner":"dev",
+      "hostname":"HNI-UAT-DB-01",
+      "site":"HN"
+    }
+  }
+]

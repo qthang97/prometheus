@@ -1,0 +1,14 @@
+version: '3.1'
+
+services:
+  snmp:
+    container_name: snmp-exporter
+    image: quay.io/prometheus/snmp-exporter
+    volumes:
+      - ./config/:/etc/snmp_exporter
+    ports:
+      - 9116:9116
+      - 116:116/udp
+    restart: always
+    command: --config.file=/etc/snmp_exporter/snmp.yml
+

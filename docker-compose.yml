@@ -1,0 +1,82 @@
+version: '3.1'
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+services:
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - 9090:9090
+    restart: always
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    restart: always
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - ./grafana/config.monitoring
+    restart: always
+
+  blackbox_exporter:
+    container_name: blackbox
+    image: prom/blackbox-exporter
+    depends_on:
+      - prometheus
+    dns: 8.8.8.8
+    ports:
+      - "9115:9115"
+    volumes:
+      - "./blackbox:/config"
+    command:
+      - '--config.file=/config/blackbox.yml'
+    restart: always
+    
+  ping_exporter:
+    container_name: ping_exporter
+    image: czerwonk/ping_exporter
+    volumes:
+      - ./ping_exporter/config:/config/
+    environment:
+      - CONFIG_FILE=/config/ping_exporter.yml
+    ports:
+      - 9427:9427
+    restart: always
+
+  snmp:
+    container_name: snmp-exporter
+    image: quay.io/prometheus/snmp-exporter
+    volumes:
+      - ./snmp_exporter/config/:/etc/snmp_exporter
+    ports:
+      - 9116:9116
+      - 116:116/udp
+    restart: always
+    command: --config.file=/etc/snmp_exporter/snmp.yml
+
