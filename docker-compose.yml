@@ -15,6 +15,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-admin-api'
     ports:
       - 9090:9090
     restart: always
@@ -58,25 +59,25 @@ services:
       - '--config.file=/config/blackbox.yml'
     restart: always
     
-  ping_exporter:
-    container_name: ping_exporter
-    image: czerwonk/ping_exporter
-    volumes:
-      - ./ping_exporter/config:/config/
-    environment:
-      - CONFIG_FILE=/config/ping_exporter.yml
-    ports:
-      - 9427:9427
-    restart: always
+#  ping_exporter:
+#    container_name: ping_exporter
+#    image: czerwonk/ping_exporter
+#    volumes:
+#      - ./ping_exporter/config:/config/
+#    environment:
+#      - CONFIG_FILE=/config/ping_exporter.yml
+#    ports:
+#      - 9427:9427
+#    restart: always
 
-  snmp:
-    container_name: snmp-exporter
-    image: quay.io/prometheus/snmp-exporter
-    volumes:
-      - ./snmp_exporter/config/:/etc/snmp_exporter
-    ports:
-      - 9116:9116
-      - 116:116/udp
-    restart: always
-    command: --config.file=/etc/snmp_exporter/snmp.yml
+#  snmp:
+#    container_name: snmp-exporter
+#    image: quay.io/prometheus/snmp-exporter
+#    volumes:
+#      - ./snmp_exporter/config/:/etc/snmp_exporter
+#    ports:
+#      - 9116:9116
+#      - 116:116/udp
+#    restart: always
+#    command: --config.file=/etc/snmp_exporter/snmp.yml
 
