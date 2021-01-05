@@ -29,5 +29,8 @@ modules:
       - expect: "PING :([^ ]+)"
         send: "PONG ${1}"
       - expect: "^:[^ ]+ 001"
-  icmp:
+  ping:
     prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: "ip4"
