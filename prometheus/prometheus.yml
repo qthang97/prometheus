@@ -47,7 +47,7 @@ scrape_configs:
     job_name: icmp
     metrics_path: /probe
     params:
-      module: [icmp]  # Look for a HTTP 200 response.
+      module: [ping]  # Look for a HTTP 200 response.
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
