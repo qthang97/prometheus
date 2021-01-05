@@ -12,19 +12,20 @@ alerting:
   alertmanagers:
   - static_configs:
     - targets:
-      - 192.168.21.254:9093
+      - alertmanager:9093
 
 scrape_configs:
   - job_name: prometheus
     metrics_path: /metrics
     static_configs:
     - targets:
-      - 192.168.21.254:9090
+      - prometheus:9090
 
   - file_sd_configs:
     - files:
       - /etc/prometheus/file_sd/windows-node.json
     job_name: windows-node
+    metrics_path: /metrics
 
   - file_sd_configs:
     - files:
@@ -33,11 +34,11 @@ scrape_configs:
     metrics_path: /metrics
 
 
-  - job_name: ping_exporter
-    metrics_path: /metrics
-    static_configs:
-    - targets:
-      - 192.168.21.254:9427
+#  - job_name: ping_exporter
+#    metrics_path: /metrics
+#    static_configs:
+#    - targets:
+#      - ping_exporter:9427
 
 #Blackbox_http
   - file_sd_configs:
@@ -53,4 +54,4 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: 192.168.21.254:9115  # The blackbox exporter's real hostname:port.
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
