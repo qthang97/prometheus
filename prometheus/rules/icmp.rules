@@ -1,0 +1,12 @@
+groups:
+- name: icmp.rules
+  rules:
+  - alert: Instance-icmp-Down
+    expr: probe_success == 0
+    for: 2s
+    labels:
+      severity: critical
+    annotations:
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down."
+      summary: "Instance {{ $labels.instance }} down"
+
