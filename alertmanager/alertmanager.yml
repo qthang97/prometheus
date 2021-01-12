@@ -11,7 +11,7 @@ route:
 receivers:
 - name: 'telegram'
   webhook_configs:
-  - url: 'http://192.168.21.254:8080/'
+  - url: 'http://alertmanager-bot:8080/'
 
 inhibit_rules:
   - source_match:
