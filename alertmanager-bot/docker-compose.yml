@@ -1,0 +1,20 @@
+version: "3"
+services:
+  alertmanager-bot:
+    container_name: "alertmanager-bot"
+    command:
+    - --alertmanager.url=http://192.168.21.254:9093
+    - --log.level=info
+    - --store=bolt
+    - --bolt.path=/data/bot.db
+    environment:
+      TELEGRAM_ADMIN: "788268348"
+      TELEGRAM_TOKEN: 1407832279:AAEqlMcpLRcbA8z-GQc3SZkB1AIuoA15Dy0
+    image: metalmatze/alertmanager-bot:0.4.3
+    ports:
+    - 8080:8080
+    restart: always
+    volumes:
+    - ./data:/data
+    - ./default.tmpl:/templates/default.tmpl
+
