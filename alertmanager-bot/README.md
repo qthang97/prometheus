@@ -373,15 +373,25 @@ TELEGRAM_ADMIN=123456789
 TELEGRAM_TOKEN=1956327394:xxx
 TEMPLATE_PATHS=/etc/alertmanager-bot/default.tmpl
 ```
+Create `alertmanager_bot.service` configuration:
+```alertmanager_bot.service
+[Unit]
+Description=alertmanager bot
 
-For example add this to your `alertmanager_bot.service` configuration:
-```.env
-ALERTMANAGER_URL=http://alertmanager:9093
-BOLT_PATH=/etc/alertmanager-bot/data/bot.db
-CONSUL_URL=localhost:8500
-LISTEN_ADDR=0.0.0.0:8080
-STORE=bolt
-TELEGRAM_ADMIN=123456789
-TELEGRAM_TOKEN=1956327394:xxx
-TEMPLATE_PATHS=/etc/alertmanager-bot/default.tmpl
+[Service]
+EnvironmentFile=/etc/alertmanager-bot/.env
+ExecStart=/etc/alertmanager-bot/alertmanager-bot-0.4.3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Reload systemd manager configuration
+```
+systemctl daemon-reload
+```
+
+Start `alertmanager_bot.service`
+```
+systemctl enable --now alertmanager_bot.service
 ```
