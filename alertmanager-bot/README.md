@@ -361,7 +361,7 @@ Messengers considered to add in the future:
 
 If one is missing for you just open an issue.
 
-## Create System Service And Run with .env file
+## Create Alertmanager bot Service And Run with .env file
 For example add this to your `.env` configuration:
 ```.env
 ALERTMANAGER_URL=http://alertmanager:9093
