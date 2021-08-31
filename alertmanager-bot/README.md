@@ -360,3 +360,28 @@ Messengers considered to add in the future:
 * [Matrix](https://matrix.org/)
 
 If one is missing for you just open an issue.
+
+## Create System Service And Run with .env file
+For example add this to your `.env` configuration:
+```.env
+ALERTMANAGER_URL=http://alertmanager:9093
+BOLT_PATH=/etc/alertmanager-bot/data/bot.db
+CONSUL_URL=localhost:8500
+LISTEN_ADDR=0.0.0.0:8080
+STORE=bolt
+TELEGRAM_ADMIN=123456789
+TELEGRAM_TOKEN=1956327394:xxx
+TEMPLATE_PATHS=/etc/alertmanager-bot/default.tmpl
+```
+
+For example add this to your `alertmanager_bot.service` configuration:
+```.env
+ALERTMANAGER_URL=http://alertmanager:9093
+BOLT_PATH=/etc/alertmanager-bot/data/bot.db
+CONSUL_URL=localhost:8500
+LISTEN_ADDR=0.0.0.0:8080
+STORE=bolt
+TELEGRAM_ADMIN=123456789
+TELEGRAM_TOKEN=1956327394:xxx
+TEMPLATE_PATHS=/etc/alertmanager-bot/default.tmpl
+```
