@@ -1,0 +1,15 @@
+version: "3.1"
+
+services:
+  prometheus_bot:
+    build: .
+    container_name: prometheus_bot
+    ports:
+      - "9087:9087"
+    command:
+      - '/prometheus_bot'
+      - ' -c /config/config.yaml -t /config/template.tmpl'
+    volumes:
+      - ./config/:/config/
+    restart: always
+
