@@ -1,0 +1,22 @@
+global:
+   resolve_timeout: 20s
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 30m
+  receiver: 'send-telegram'
+
+receivers:
+- name: 'send-telegram'
+  webhook_configs:
+    - send_resolved: true
+      url: http://10.255.255.200:9087/alert/xxxxxx
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'job', 'instance']
+
