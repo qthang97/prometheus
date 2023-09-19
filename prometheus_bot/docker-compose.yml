@@ -6,10 +6,7 @@ services:
     container_name: prometheus_bot
     ports:
       - "9087:9087"
-    command:
-      - '/prometheus_bot'
-      - ' -c /config/config.yaml -t /config/template.tmpl'
     volumes:
-      - ./config/:/config/
+      - ./config/config.yaml:/config.yaml
+      - ./config/template.tmpl:/template.tmpl
     restart: always
-
