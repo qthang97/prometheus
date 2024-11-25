@@ -4,14 +4,27 @@ route:
   group_by: ['alertname']
   group_wait: 10s
   group_interval: 10s
-  repeat_interval: 30m
+  repeat_interval: 1m
   receiver: 'send-telegram'
+
+# overide route
+  routes:
+    - matchers:
+      - job=MCC
+      receiver: 'send-telegram'
+      active_time_intervals:
+        - 'active_time'
 
 receivers:
 - name: 'send-telegram'
   webhook_configs:
     - send_resolved: true
-      url: http://10.255.255.200:9087/alert/xxxxxx
+      url: http://prometheus_bot:9087/alert/788268348
+
+- name: 'not_alter'
+  webhook_configs:
+    - send_resolved: true
+      url: http://prometheus_bot:9089/alter/i
 
 inhibit_rules:
   - source_match:
@@ -20,3 +33,13 @@ inhibit_rules:
       severity: 'warning'
     equal: ['alertname', 'job', 'instance']
 
+#set time Active
+time_intervals:
+  - name: 'active_time'
+    time_intervals:
+      - weekdays: ['monday:friday']
+# must has location, if don't have location system get time zone UTC
+        location: 'Asia/Ho_Chi_Minh'
+        times:
+          - start_time: "07:00"
+            end_time: "11:30"
