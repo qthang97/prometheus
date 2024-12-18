@@ -1,7 +1,8 @@
 global:
    resolve_timeout: 20s
 route:
-  group_by: ['alertname']
+  # group by, if not has job or instance, new alter is group with alertname. alertmanager will send mess alert or resolved when has new altername. it have not send new mess when have job or instance
+  group_by: ['alertname', 'job', 'instance']
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1m
@@ -20,11 +21,6 @@ receivers:
   webhook_configs:
     - send_resolved: true
       url: http://prometheus_bot:9087/alert/788268348
-
-- name: 'not_alter'
-  webhook_configs:
-    - send_resolved: true
-      url: http://prometheus_bot:9089/alter/i
 
 inhibit_rules:
   - source_match:
