@@ -14,6 +14,7 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.enable-admin-api'
+      - '--storage.tsdb.retention.time=180d'
     ports:
       - 9090:9090
     restart: always

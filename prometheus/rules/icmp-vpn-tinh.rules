@@ -1,11 +1,11 @@
 groups:
-- name: icmp.rules
+- name: icmp-vpn-tinh.rules
   rules:
   - alert: Instance-ICMP-Down
-    expr: probe_success{job!~"VPN-Tinh|MCC"} == 0
+    expr: probe_success{job="VPN-Tinh"} == 0
     for: 10s
     labels:
-      severity: critical
+      severity: VPN-Tinh-Down
     annotations:
       description: "{{ $labels.instance }} of job {{ $labels.job }} - {{ $labels.name }} has been down."
       summary: "Instance {{ $labels.instance }} - {{ $labels.name }} down"

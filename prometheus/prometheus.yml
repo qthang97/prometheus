@@ -40,14 +40,251 @@ scrape_configs:
 #    - targets:
 #      - ping_exporter:9427
 
-#Blackbox_http
-  - file_sd_configs:
+# Blackbox IP Monitor manualIP
+  - job_name: icmp
+    file_sd_configs:
     - files:
       - /etc/prometheus/file_sd/icmp.json
-    job_name: icmp
     metrics_path: /probe
     params:
-      module: [ping]  # Look for a HTTP 200 response.
+      module: [icmp]  # Look for a icmp response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox camera
+  - file_sd_configs:
+    - files:
+      - /etc/prometheus/file_sd/camera.json
+    job_name: camera
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a icmp response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox wifi
+  - file_sd_configs:
+    - files:
+      - /etc/prometheus/file_sd/wifi.json
+    job_name: wifi
+    metrics_path: /probe
+    params:
+      module: [icmp_ttl5]  # Look for a icmp_ttl5 response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox line Internet
+  - job_name: line_internet
+    static_configs:
+      - targets: ['27.74.241.53']
+        labels:
+          name: 'VNPT'
+      - targets: ['113.161.86.86']
+        labels:
+          name: 'Viettel'
+    metrics_path: /probe
+    params:
+      module: [icmp]  # Look for a icmp response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox MCC
+  - job_name: MCC
+    static_configs:
+      - targets: ['192.168.100.9']
+        labels:
+          name: 'Nam Dinh'
+      - targets: ['192.168.103.9']
+        labels:
+          name: 'Ninh Binh'
+      - targets: ['192.168.104.9']
+        labels:
+          name: 'Kien Giang'
+      - targets: ['192.168.105.9']
+        labels:
+          name: 'Hai Phong'
+      - targets: ['192.168.106.9']
+        labels:
+          name: 'Thanh Hoa'
+      - targets: ['192.168.108.9']
+        labels:
+          name: 'Binh Duong'
+      - targets: ['192.168.109.13']
+        labels:
+          name: 'Khanh Hoa'
+      - targets: ['192.168.111.9']
+        labels:
+          name: 'Da Lat'
+      - targets: ['192.168.113.9']
+        labels:
+          name: 'Gia Lai'
+      - targets: ['192.168.114.9']
+        labels:
+          name: 'Can Tho'
+      - targets: ['192.168.114.9']
+        labels:
+          name: 'Can Tho'
+      - targets: ['192.168.119.9']
+        labels:
+          name: 'Hung Yen'
+      - targets: ['192.168.121.9']
+        labels:
+          name: 'Dak Lak'
+      - targets: ['192.168.123.9']
+        labels:
+          name: 'Lam Dong'
+      - targets: ['192.168.124.9']
+        labels:
+          name: 'Hue'
+      - targets: ['192.168.54.9']
+        labels:
+          name: 'Nghe An'
+      - targets: ['192.168.52.9']
+        labels:
+          name: 'Da Nang'
+    metrics_path: /probe
+    params:
+      module: [icmp_ttl5]  # Look for a icmp_ttl5 response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 192.168.12.102:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox VPN-Tinh
+  - job_name: VPN-Tinh
+    static_configs:
+      - targets: ['192.168.100.1']
+        labels:
+          name: 'Nam Dinh'
+          type: 'VPN'
+      - targets: ['192.168.103.1']
+        labels:
+          name: 'Ninh Binh'
+          type: 'VPN'
+      - targets: ['192.168.104.1']
+        labels:
+          name: 'Kien Giang'
+          type: 'VPN'
+      - targets: ['192.168.105.1']
+        labels:
+          name: 'Hai Phong'
+          type: 'VPN'
+      - targets: ['192.168.106.1']
+        labels:
+          name: 'Thanh Hoa'
+          type: 'VPN'
+      - targets: ['192.168.108.1']
+        labels:
+          name: 'Binh Duong'
+          type: 'VPN'
+      - targets: ['192.168.109.1']
+        labels:
+          name: 'Khanh Hoa'
+          type: 'VPN'
+      - targets: ['192.168.111.1']
+        labels:
+          name: 'Da Lat'
+          type: 'VPN'
+      - targets: ['192.168.113.1']
+        labels:
+          name: 'Gia Lai'
+          type: 'VPN'
+      - targets: ['192.168.114.1']
+        labels:
+          name: 'Can Tho'
+          type: 'VPN'
+      - targets: ['192.168.114.1']
+        labels:
+          name: 'Can Tho'
+          type: 'VPN'
+      - targets: ['192.168.119.1']
+        labels:
+          name: 'Hung Yen'
+          type: 'VPN'
+      - targets: ['192.168.121.1']
+        labels:
+          name: 'Dak Lak'
+          type: 'VPN'
+      - targets: ['192.168.123.1']
+        labels:
+          name: 'Lam Dong'
+          type: 'VPN'
+      - targets: ['192.168.124.1']
+        labels:
+          name: 'Hue'
+          type: 'VPN'
+      - targets: ['192.168.54.1']
+        labels:
+          name: 'Nghe An'
+          type: 'VPN'
+      - targets: ['192.168.52.1']
+        labels:
+          name: 'Da Nang'
+          type: 'VPN'
+    metrics_path: /probe
+    params:
+      module: [icmp_ttl5]  # Look for a icmp_ttl5 response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 192.168.12.102:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox http module
+  - job_name: dau_ghi
+    static_configs:
+      - targets:
+        - 'http://192.168.38.254:88'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a icmp_ttl5 response.
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox:9115  # The blackbox exporter's real hostname:port.
+
+# Blackbox http module
+  - job_name: Server_On_VPN_Site
+    static_configs:
+      - targets: ['192.168.12.102:8112']
+        labels:
+          name: 'Radius Mobile'
+          type: 'VPN'
+      - targets: ['192.168.12.102:8113']
+        labels:
+          name: 'Radius Laptop'
+          type: 'VPN'
+    metrics_path: /probe
+    params:
+      module: [tcp_connect]  # Look for a http_2xx response.
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target

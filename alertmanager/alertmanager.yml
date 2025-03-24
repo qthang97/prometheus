@@ -1,17 +1,15 @@
 global:
-   resolve_timeout: 20s
+   resolve_timeout: 10s
 route:
-  # group by, if not has job or instance, new alter is group with alertname. alertmanager will send mess alert or resolved when has new altername. it have not send new mess when have job or instance
-  group_by: ['alertname', 'job', 'instance']
-  group_wait: 10s
+  group_by: ['alertname', 'job','instance','name','type']
+  group_wait: 5s
   group_interval: 10s
-  repeat_interval: 1m
+  repeat_interval: 30m
   receiver: 'send-telegram'
-
-# overide route
   routes:
     - matchers:
-      - job=MCC
+      - job="MCC"
+      - job="VPN-Tinh"
       receiver: 'send-telegram'
       active_time_intervals:
         - 'active_time'
@@ -20,22 +18,28 @@ receivers:
 - name: 'send-telegram'
   webhook_configs:
     - send_resolved: true
-      url: http://prometheus_bot:9087/alert/788268348
+      url: http://192.168.21.254:9087/alert/788268348
 
 inhibit_rules:
   - source_match:
-      severity: 'critical'
+      severity: 'VPN-Tinh-Down'
     target_match:
-      severity: 'warning'
-    equal: ['alertname', 'job', 'instance']
+      severity: 'MCC-Down'
+#      matchers: [ severity="warning" ]
+    equal: ['alertname', 'name']
 
-#set time Active
+  - source_match:
+      severity: 'VPN-Tinh-Down'
+    target_match:
+      severity: 'critical'
+    equal: ['alertname', 'type']
+
 time_intervals:
   - name: 'active_time'
     time_intervals:
       - weekdays: ['monday:friday']
-# must has location, if don't have location system get time zone UTC
         location: 'Asia/Ho_Chi_Minh'
         times:
           - start_time: "07:00"
-            end_time: "11:30"
+            end_time: "19:00"
+

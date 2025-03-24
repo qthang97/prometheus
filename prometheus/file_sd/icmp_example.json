@@ -5,6 +5,12 @@
       "name": "Pbx",
       "type": "VPN"
     }
+  },
+  {
+    "targets": ["www.google.com.sf"],
+    "labels": {
+      "name": "Google"
+    }
   }
 ]
 

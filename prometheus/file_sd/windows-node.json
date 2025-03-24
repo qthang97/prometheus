@@ -1,14 +1,4 @@
-[{
-    "targets": [
-      "192.168.20.7:9182"
-    ],
-    "labels": {
-      "hostname":"SAPO-SRV-1",
-      "site":"HCM",
-      "env":"Printer",
-      "own":"IT"
-    }
-  },
+[
   {
     "targets": [
       "192.168.20.253:9182"
