@@ -7,10 +7,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"path"
 	"sort"
 	"strconv"
@@ -21,10 +21,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/microcosm-cc/bluemonday"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Alerts struct {
@@ -49,14 +49,16 @@ type Alert struct {
 }
 
 type Config struct {
-	TelegramToken       string `yaml:"telegram_token"`
-	TemplatePath        string `yaml:"template_path"`
-	TimeZone            string `yaml:"time_zone"`
-	TimeOutFormat       string `yaml:"time_outdata"`
-	SplitChart          string `yaml:"split_token"`
-	SplitMessageBytes   int    `yaml:"split_msg_byte"`
-	SendOnly            bool   `yaml:"send_only"`
-	DisableNotification bool   `yaml:"disable_notification"`
+	TelegramToken string `yaml:"telegram_token"`
+	// add custom URL API, use pointer to allow nil or undefined
+	TelegramURLAPI      *string `yaml:"telegram_url_api"`
+	TemplatePath        string  `yaml:"template_path"`
+	TimeZone            string  `yaml:"time_zone"`
+	TimeOutFormat       string  `yaml:"time_outdata"`
+	SplitChart          string  `yaml:"split_token"`
+	SplitMessageBytes   int     `yaml:"split_msg_byte"`
+	SendOnly            bool    `yaml:"send_only"`
+	DisableNotification bool    `yaml:"disable_notification"`
 }
 
 /**
@@ -161,7 +163,7 @@ func str_Format_MeasureUnit(MeasureUnit string, value string) string {
 }
 
 // Scale number for It measure unit
-func str_Format_Byte(in string, j1 int) string {
+func str_Format_Byte(in string, initial int) string {
 	var str_Size string
 
 	f, err := strconv.ParseFloat(in, 64)
@@ -170,7 +172,7 @@ func str_Format_Byte(in string, j1 int) string {
 		panic(err)
 	}
 
-	for j1 = 0; j1 < (Information_Size_MAX + 1); j1++ {
+	for j1 := initial; j1 < (Information_Size_MAX + 1); j1++ {
 
 		if j1 >= Information_Size_MAX {
 			str_Size = "Yb"
@@ -206,7 +208,7 @@ func str_Format_Byte(in string, j1 int) string {
 }
 
 // Format number for fisics measure unit
-func str_Format_Scale(in string, j1 int) string {
+func str_Format_Scale(in string, initial int) string {
 	var str_Size string
 
 	f, err := strconv.ParseFloat(in, 64)
@@ -215,7 +217,7 @@ func str_Format_Scale(in string, j1 int) string {
 		panic(err)
 	}
 
-	for j1 = 0; j1 < (Scale_Size_MAX + 1); j1++ {
+	for j1 := initial; j1 < (Scale_Size_MAX + 1); j1++ {
 
 		if j1 >= Scale_Size_MAX {
 			str_Size = "Y"
@@ -267,13 +269,11 @@ func str_FormatDate(toformat string) string {
 
 	// Error handling
 	if cfg.TimeZone == "" {
-		log.Println("template_time_zone is not set, if you use template and `str_FormatDate` func is required")
-		panic(nil)
+		log.Fatal("template_time_zone is not set, if you use template and `str_FormatDate` func is required")
 	}
 
 	if cfg.TimeOutFormat == "" {
-		log.Println("template_time_outdata param is not set, if you use template and `str_FormatDate` func is required")
-		panic(nil)
+		log.Fatal("template_time_outdata param is not set, if you use template and `str_FormatDate` func is required")
 	}
 
 	t, err := time.Parse(time.RFC3339Nano, toformat)
@@ -305,7 +305,7 @@ var cfg = Config{}
 var bot *tgbotapi.BotAPI
 var tmpH *template.Template
 
-// Template addictional functions map
+// Template additional functions map
 var funcMap = template.FuncMap{
 	"str_FormatDate":         str_FormatDate,
 	"str_UpperCase":          strings.ToUpper,
@@ -315,16 +315,14 @@ var funcMap = template.FuncMap{
 	"str_Format_Byte":        str_Format_Byte,
 	"str_Format_MeasureUnit": str_Format_MeasureUnit,
 	"HasKey":                 HasKey,
+	"contains":               strings.Contains,
 }
 
 func telegramBot(bot *tgbotapi.BotAPI) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 
 	introduce := func(update tgbotapi.Update) {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf("Chat id is '%d'", update.Message.Chat.ID))
@@ -342,8 +340,8 @@ func telegramBot(bot *tgbotapi.BotAPI) {
 			continue
 		}
 
-		if update.Message.NewChatMembers != nil && len(*update.Message.NewChatMembers) > 0 {
-			for _, member := range *update.Message.NewChatMembers {
+		if len(update.Message.NewChatMembers) > 0 {
+			for _, member := range update.Message.NewChatMembers {
 				if member.UserName == bot.Self.UserName && update.Message.Chat.Type == "group" {
 					introduce(update)
 				}
@@ -389,7 +387,7 @@ func SplitString(s string, n int) []string {
 func main() {
 	flag.Parse()
 
-	content, err := ioutil.ReadFile(*config_path)
+	content, err := os.ReadFile(*config_path)
 	if err != nil {
 		log.Fatalf("Problem reading configuration file: %v", err)
 	}
@@ -403,7 +401,7 @@ func main() {
 	}
 
 	if *token_path != "" {
-		content, err := ioutil.ReadFile(*token_path)
+		content, err := os.ReadFile(*token_path)
 		if err != nil {
 			log.Fatalf("Problem reading token file: %v", err)
 		}
@@ -414,16 +412,12 @@ func main() {
 		cfg.SplitMessageBytes = 4000
 	}
 
-	if *debug {
-		bot.Debug = true
-	}
 	if cfg.TemplatePath != "" {
 
 		tmpH = loadTemplate(cfg.TemplatePath)
 
 		if cfg.TimeZone == "" {
 			log.Fatalf("You must define time_zone of your bot")
-			panic(-1)
 		}
 
 	} else {
@@ -435,14 +429,27 @@ func main() {
 	}
 
 	for {
-		bot_tmp, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
+		//Default
+		//bot_tmp, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
+
+		if cfg.TelegramURLAPI == nil {
+			endpoint := tgbotapi.APIEndpoint
+			cfg.TelegramURLAPI = &endpoint
+		}
+		log.Printf("cfg.TelegramURLAPI: %s", *cfg.TelegramURLAPI)
+		bot_tmp, err := tgbotapi.NewBotAPIWithAPIEndpoint(cfg.TelegramToken, *cfg.TelegramURLAPI)
 		if err == nil {
 			bot = bot_tmp
+
 			break
 		} else {
 			log.Printf("Error initializing telegram connection: %s", err)
 			time.Sleep(time.Second)
 		}
+	}
+
+	if *debug {
+		bot.Debug = true
 	}
 
 	log.Printf("Authorised on account %s", bot.Self.UserName)
@@ -456,24 +463,25 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/ping/:chatid", GET_Handling)
+	router.GET("/ping/:chatid/:topicid", GET_Handling)
 	router.POST("/alert/:chatid", POST_Handling)
-	router.Run(*listen_addr)
+	router.POST("/alert/:chatid/:topicid", POST_Handling)
+
+	err = router.Run(*listen_addr)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func GET_Handling(c *gin.Context) {
 	log.Printf("Received GET")
-	chatid, err := strconv.ParseInt(c.Param("chatid"), 10, 64)
-	if err != nil {
-		log.Printf("Cat't parse chat id: %q", c.Param("chatid"))
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"err": fmt.Sprint(err),
-		})
-		return
-	}
+	topicid := getID(c, "topicid")
+	chatid := getID(c, "chatid")
+	log.Printf("Bot test: %d:%d", chatid, topicid)
 
-	log.Printf("Bot test: %d", chatid)
-	msgtext := fmt.Sprintf("Some HTTP triggered notification by prometheus bot... %d", chatid)
+	msgtext := fmt.Sprintf("Some HTTP triggered notification by prometheus bot... %d:%d", chatid, topicid)
 	msg := tgbotapi.NewMessage(chatid, msgtext)
+	msg.ReplyToMessageID = int(topicid)
 	if cfg.DisableNotification {
 		msg.DisableNotification = true
 	}
@@ -564,7 +572,6 @@ func AlertFormatTemplate(alerts Alerts) string {
 
 	if err != nil {
 		log.Fatalf("Problem with template execution: %v", err)
-		panic(err)
 	}
 
 	return bytesBuff.String()
@@ -579,23 +586,16 @@ func SanitizeMsg(str string) string {
 	d.Strict = false
 	d.AutoClose = xml.HTMLAutoClose
 	d.Entity = xml.HTMLEntity
-	exitParser := false
+
 	for {
 		_, err := d.Token()
-		switch err {
-		case io.EOF:
+		if err == io.EOF {
 			log.Println("HTML is valid, sending it...")
-			exitParser = true
 			break
-		case nil:
-		default:
+		} else if err != nil {
 			log.Println("HTML is not valid, strip all tags to prevent error")
 			p := bluemonday.StrictPolicy()
 			str = p.Sanitize(str)
-			exitParser = true
-			break
-		}
-		if exitParser {
 			break
 		}
 	}
@@ -603,21 +603,29 @@ func SanitizeMsg(str string) string {
 	return str
 }
 
+// get id from relative path
+func getID(c *gin.Context, param string) int64 {
+	// default topicid for messageConfig 0
+	if c.Param(param) == "" && param == "topicid" {
+		return 0
+	}
+	id, err := strconv.ParseInt(c.Param(param), 10, 64)
+	if err != nil {
+		log.Printf("Can't parse %s id: %q", param, c.Param(param))
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"err": fmt.Sprint(err),
+		})
+	}
+	return id
+}
+
 func POST_Handling(c *gin.Context) {
 	var msgtext string
 	var alerts Alerts
 
-	chatid, err := strconv.ParseInt(c.Param("chatid"), 10, 64)
-
-	log.Printf("Bot alert post: %d", chatid)
-
-	if err != nil {
-		log.Printf("Cat't parse chat id: %q", c.Param("chatid"))
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"err": fmt.Sprint(err),
-		})
-		return
-	}
+	topicid := getID(c, "topicid")
+	chatid := getID(c, "chatid")
+	log.Printf("Bot alert post: chat %d, topic %d", chatid, topicid)
 
 	binding.JSON.Bind(c.Request, &alerts)
 
@@ -629,7 +637,7 @@ func POST_Handling(c *gin.Context) {
 
 	log.Println("+------------------  A L E R T  J S O N  -------------------+")
 	log.Printf("%s", s)
-	log.Println("+-----------------------------------------------------------+\n\n")
+	log.Println("+-----------------------------------------------------------+")
 
 	// Decide how format Text
 	if cfg.TemplatePath == "" {
@@ -643,6 +651,7 @@ func POST_Handling(c *gin.Context) {
 
 		msg := tgbotapi.NewMessage(chatid, sanitizedString)
 		msg.ParseMode = tgbotapi.ModeHTML
+		msg.ReplyToMessageID = int(topicid)
 
 		// Print in Log result message
 		log.Println("+---------------  F I N A L   M E S S A G E  ---------------+")

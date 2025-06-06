@@ -1,11 +1,9 @@
-version: "3.1"
-
 services:
   prometheus_bot:
     build: .
     container_name: prometheus_bot
     ports:
-      - "9087:9087"
+      - '9087:9087'
     volumes:
       - ./config/config.yaml:/config.yaml
       - ./config/template.tmpl:/template.tmpl
