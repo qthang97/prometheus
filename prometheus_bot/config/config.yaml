@@ -1,0 +1,9 @@
+telegram_token: "token"
+template_path: "template.tmpl" # your template file name
+time_zone: "Asia/Ho_Chi_Minh" # your time zone check it out from WIKI
+split_token: ":" # token used for split measure label.
+disable_notification: True  # disable notification for messages.
+telegram_url_api: "https://api.telegram.org/bot%s/%s"
+# ONLY IF YOU USING DATA FORMATTING FUNCTION, NOTE for developer: important or test fail
+time_outdata: "02/01/2006 15:04:05"
+split_msg_byte: 4000
