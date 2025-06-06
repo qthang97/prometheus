@@ -15,10 +15,22 @@ route:
         - 'active_time'
 
 receivers:
-- name: 'send-telegram'
-  webhook_configs:
-    - send_resolved: true
-      url: http://192.168.21.254:9087/alert/788268348
+  - name: 'default-receiver' # multi receivers
+    webhook_configs:  # telegram
+      - send_resolved: true
+        url: http://192.168.21.254:9087/alert/ChatID
+
+    slack_configs:    # slack
+      - send_resolved: true
+        channel: '#alert-sapo'
+        api_url: 'Slack App URL'
+        text: -|
+            *Alert:* {{ .CommonLabels.alertname }} - *Severity:* {{ .CommonLabels.severity }}
+            *Instance:* {{ .CommonLabels.instance }}
+            *Type:* {{ .CommonLabels.type }} - *Name:* {{ .CommonLabels.name }}
+            *Description:* {{ .CommonAnnotations.description }}
+            *Status:* {{ .Status }}
+
 
 inhibit_rules:
   - source_match:
