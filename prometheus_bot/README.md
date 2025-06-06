@@ -161,7 +161,7 @@ Sysadmin usually love copy.
 
 ## Telegram is blocked by ISP
 
-Your ISP is blocked Telegram cannot use Default Telegram API
+Your ISP is blocked Telegram cannot use Default Telegram API, use Cloudflare Workers like Middleware API
 
 ### Add Telegram custom API to ```config.yaml```.
 
