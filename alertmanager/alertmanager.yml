@@ -1,57 +1,70 @@
 global:
    resolve_timeout: 10s
 route:
-  group_by: ['alertname', 'job','instance','name','type']
+  group_by: ['alertname', 'job','instance','type','name']
   group_wait: 5s
-  group_interval: 10s
+  group_interval: 5s
   repeat_interval: 30m
-  receiver: 'send-telegram'
+  receiver: 'default-receiver'
   routes:
     - matchers:
-      - job="MCC"
-      - job="VPN-Tinh"
-      receiver: 'send-telegram'
+      - job="devices_tinh"
+      receiver: 'default-receiver'
       active_time_intervals:
-        - 'active_time'
+        - 'active_time_morning'
+      continue: true # add if want run 2 matchers
+
+    - matchers:
+      - job="devices_tinh"
+      receiver: 'default-receiver'
+      active_time_intervals:
+        - 'active_time_evening'
+
 
 receivers:
-  - name: 'default-receiver' # multi receivers
+  - name: 'default-receiver'
     webhook_configs:  # telegram
       - send_resolved: true
-        url: http://192.168.21.254:9087/alert/ChatID
+        url: http://192.168.21.254:9087/alert/788268348
 
-    slack_configs:    # slack
-      - send_resolved: true
-        channel: '#alert-sapo'
-        api_url: 'Slack App URL'
-        text: -|
-            *Alert:* {{ .CommonLabels.alertname }} - *Severity:* {{ .CommonLabels.severity }}
-            *Instance:* {{ .CommonLabels.instance }}
-            *Type:* {{ .CommonLabels.type }} - *Name:* {{ .CommonLabels.name }}
-            *Description:* {{ .CommonAnnotations.description }}
-            *Status:* {{ .Status }}
-
+#    slack_configs:    # slack
+#      - send_resolved: true
+#        channel: '#alert-sapo'
+#        api_url: 'https://hooks.slack.com/services/tocken'
+#        text: |-
+#            *Alert:* {{ .CommonLabels.alertname }} - *Severity:* {{ .CommonLabels.severity }}
+#            *Instance:* {{ .CommonLabels.instance }}
+#            *Type:* {{ .CommonLabels.type }} - *Name:* {{ .CommonLabels.name }}
+#            *Description:* {{ .CommonAnnotations.description }}
+#            *Status:* {{ .Status }}
 
 inhibit_rules:
-  - source_match:
-      severity: 'VPN-Tinh-Down'
-    target_match:
-      severity: 'MCC-Down'
+#  - source_match:
+#      severity: 'VPN-Tinh-Down'
+#    target_match:
+#      severity: 'MCC-Down'
 #      matchers: [ severity="warning" ]
-    equal: ['alertname', 'name']
+#    equal: ['alertname', 'name']
 
   - source_match:
-      severity: 'VPN-Tinh-Down'
-    target_match:
       severity: 'critical'
-    equal: ['alertname', 'type']
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'job', 'name']
 
 time_intervals:
-  - name: 'active_time'
+  - name: 'active_time_morning'
     time_intervals:
       - weekdays: ['monday:friday']
         location: 'Asia/Ho_Chi_Minh'
         times:
-          - start_time: "07:00"
-            end_time: "19:00"
+          - start_time: "07:30"
+            end_time: "12:10"
 
+  - name: 'active_time_evening'
+    time_intervals:
+      - weekdays: ['monday:friday']
+        location: 'Asia/Ho_Chi_Minh'
+        times:
+          - start_time: "13:30"
+            end_time: "18:30"
