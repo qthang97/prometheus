@@ -1,4 +1,4 @@
-alerts1='[
+alerts='[
   {
     "labels": {
        "alertname": "DiskRunningFull",
@@ -20,6 +20,6 @@ alerts1='[
         "info": "The disk sda2 is running full",
         "summary": "please check the instance example2"
       }
-  },
+  }
 ]'
-curl -XPOST -d"$alerts" http://localhost:9093/api/v1/alerts
+curl -XPOST -H "Content-Type: application/json" -d"$alerts" http://192.168.21.254:9093/api/v2/alerts
